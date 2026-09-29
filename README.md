@@ -2,19 +2,19 @@
 
 Proyecto universitario para la asignatura **Patrones de Software**.
 
-CotizaIA es una plataforma propuesta para agencias pequeñas y freelancers. A partir de un brief desordenado, un agente procesará la solicitud por etapas, sin mantener una conversación: clasificará el proyecto, extraerá requisitos, señalará ambigüedades y sugerirá horas de trabajo. La aplicación calculará el precio mediante tarifas configuradas y preparará una propuesta, un cronograma y un borrador contractual. Una persona revisará y aprobará los resultados antes de enviarlos. La IA no decidirá el precio final ni firmará contratos.
+CotizaIA es un proyecto para agencias pequeñas y freelancers. Su primera fase es una API REST que recibe un brief, detecta requisitos y preguntas mediante reglas locales, estima horas ilustrativas, calcula un precio y crea una propuesta para aprobación o rechazo humano. **Las reglas actuales no son inteligencia artificial.** La visión posterior contempla un agente sin conversación, cronogramas y borradores contractuales; no existen todavía esas capacidades.
 
-Todo el sistema se desarrollará en **Java**, con **Spring Boot** para el backend y **PostgreSQL** como persistencia prevista.
+El backend está escrito en **Java con Spring Boot**. Guarda propuestas e historial **en memoria: se pierden al reiniciar**. PostgreSQL sigue previsto para una fase posterior.
 
 ## 1. Estado real del proyecto
 
-**Revisión: 29 de septiembre de 2026.** El repositorio contiene un README inicial y metadatos de Git. No hay código fuente, dependencias, pruebas ni configuración de la aplicación. Este documento amplía la documentación inicial y define el alcance; todavía no existe una aplicación ejecutable.
+**Fase 1, 29 de septiembre de 2026.** API de demostración local, con cinco endpoints, validación de entrada, cálculo con `BigDecimal`, siete patrones y pruebas automatizadas. No tiene autenticación: el nombre del revisor es declarado, no verificado. El servidor escucha en `127.0.0.1` por defecto.
 
 | Estado | Significado | Situación actual |
 | --- | --- | --- |
-| Implementado | Existe código verificable que cubre la capacidad indicada. | Ninguna funcionalidad implementada en la carpeta revisada. |
-| En desarrollo | Existe código parcial que aún no cumple sus criterios de aceptación. | No se encontró evidencia de implementación parcial. |
-| Propuesto | Existe una definición pendiente de implementación. | Backend, seguridad, persistencia, IA, documentos, interfaz e integraciones. |
+| Implementado | Código y pruebas de esta fase. | Recepción de brief, reglas, desglose, tarifa por solicitud, propuesta en revisión, aprobación/rechazo e historial. |
+| En desarrollo | Parte del requisito global funciona; faltan capacidades indicadas. | Revisión completa, análisis semántico, gestión de propuestas y trazabilidad autenticada. |
+| Propuesto | Sin implementación. | Usuarios, agencias, PostgreSQL, IA real, contratos, cronogramas, envíos, frontend, pagos simulados y métricas. |
 
 El equipo actualizará estos estados al incorporar código y verificar sus criterios de aceptación.
 
@@ -84,7 +84,7 @@ Ante un fallo de IA, el responsable podrá completar el análisis manualmente. A
 
 ## 6. Alcance y límites
 
-El alcance inicial comprende backend, ingreso de texto, datos comerciales, cálculo y revisión humana. La IA, los documentos y las integraciones se incorporarán en fases posteriores.
+La fase implementada comprende backend, ingreso de texto, cliente como nombre libre, tarifa por solicitud, cálculo y decisión humana. No hay catálogo ni registro independiente de clientes. Las preguntas son advertencias: la API no registra respuestas ni bloquea por ambigüedades. La persona decide tras revisar los supuestos. La aprobación interna no representa aceptación del cliente ni envío.
 
 | Alcance propuesto | Límite |
 | --- | --- |
@@ -99,22 +99,22 @@ La tecnología de la interfaz de usuario en Java está pendiente de selección.
 
 ## 7. Requisitos funcionales
 
-**Prioridades:** alta = necesaria para el flujo principal; media = ampliación posterior. Los criterios describen pruebas futuras, no resultados obtenidos.
+**Prioridades:** alta = necesaria para el flujo principal; media = ampliación posterior. Los criterios conservan el alcance global; «En desarrollo» identifica el subconjunto disponible, sin dar por satisfecho todo el requisito.
 
 | ID | Requisito | Actor | Prioridad | Criterio de aceptación | Estado |
 | --- | --- | --- | --- | --- | --- |
 | RF-01 | Registrar agencias y usuarios e iniciar sesión. | Propietario y revisor | Alta | Crear agencia y usuario; aceptar credenciales válidas, rechazar inválidas y bloquear consultas a otra agencia. | Propuesto |
 | RF-02 | Administrar servicios y tarifas por rol. | Propietario | Alta | Guardar servicio, rol, valor por hora y moneda; rechazar valores negativos y conservar la tarifa usada en cada cotización. | Propuesto |
 | RF-03 | Registrar clientes. | Comercial | Alta | Crear y consultar un cliente asociado a una agencia; rechazar registros sin nombre y consultas desde otra agencia. | Propuesto |
-| RF-04 | Ingresar briefs mediante texto pegado. | Comercial | Alta | Guardar texto no vacío con cliente, agencia y fecha; recuperar el contenido original sin alteraciones. | Propuesto |
-| RF-05 | Clasificar proyectos y extraer requisitos. | Agente y revisor | Alta | Producir una categoría y requisitos identificables con referencia al texto o marca de supuesto para un brief de prueba. | Propuesto |
-| RF-06 | Identificar ambigüedades y preguntas aclaratorias. | Agente y comercial | Alta | Ante un brief sin alcance de pagos, registrar la omisión y una pregunta; impedir aprobación si queda una ambigüedad crítica. | Propuesto |
-| RF-07 | Estimar horas con desglose. | Agente y revisor | Alta | Mostrar tarea, rol, horas y supuestos por ítem; comprobar suma del total y rechazar horas negativas. | Propuesto |
-| RF-08 | Calcular precio mediante tarifas y reglas. | Comercial | Alta | Con 10 horas a 50.000 COP y 4 a 60.000 COP, sin ajustes, obtener 740.000 COP; bloquear el cálculo si falta una tarifa. | Propuesto |
-| RF-09 | Generar y editar propuestas. | Comercial y revisor | Alta | Crear versión con alcance, exclusiones, ítems, moneda y total; guardar una edición e invalidar la aprobación anterior. | Propuesto |
+| RF-04 | Ingresar briefs mediante texto pegado. | Comercial | Alta | Guardar texto no vacío con cliente, agencia y fecha; recuperar el contenido original sin alteraciones. | En desarrollo: texto, cliente y fecha en memoria; sin agencias. |
+| RF-05 | Clasificar proyectos y extraer requisitos. | Agente y revisor | Alta | Producir una categoría y requisitos identificables con referencia al texto o marca de supuesto para un brief de prueba. | En desarrollo: cuatro categorías de requisitos por palabras clave; sin clasificación de proyecto ni IA. |
+| RF-06 | Identificar ambigüedades y preguntas aclaratorias. | Agente y comercial | Alta | Ante un brief sin alcance de pagos, registrar la omisión y una pregunta; impedir aprobación si queda una ambigüedad crítica. | En desarrollo: preguntas fijas; sin bloqueo por ambigüedad. |
+| RF-07 | Estimar horas con desglose. | Agente y revisor | Alta | Mostrar tarea, rol, horas y supuestos por ítem; comprobar suma del total y rechazar horas negativas. | En desarrollo: tareas y horas ilustrativas; sin roles ni edición. |
+| RF-08 | Calcular precio mediante tarifas y reglas. | Comercial | Alta | Con 10 horas a 50.000 COP y 4 a 60.000 COP, sin ajustes, obtener 740.000 COP; bloquear el cálculo si falta una tarifa. | En desarrollo: una tarifa por solicitud, sin tarifas por rol ni catálogo. |
+| RF-09 | Generar y editar propuestas. | Comercial y revisor | Alta | Crear versión con alcance, exclusiones, ítems, moneda y total; guardar una edición e invalidar la aprobación anterior. | En desarrollo: creación y consulta JSON; sin edición ni versiones. |
 | RF-10 | Generar y editar cronogramas. | Comercial y revisor | Alta | Crear fases con horas, dependencias y capacidad declarada; recalcular la planificación al modificar horas. | Propuesto |
 | RF-11 | Generar y editar borradores contractuales. | Comercial y revisor | Alta | Obtener un documento marcado como borrador, vinculado a la versión de propuesta y con campos pendientes identificados. | Propuesto |
-| RF-12 | Gestionar cola de revisión, aprobación y rechazo. | Comercial y revisor | Alta | Listar pendientes; registrar usuario y fecha de decisión, exigir motivo al rechazar y bloquear acciones sin permiso. | Propuesto |
+| RF-12 | Gestionar cola de revisión, aprobación y rechazo. | Comercial y revisor | Alta | Listar pendientes; registrar usuario y fecha de decisión, exigir motivo al rechazar y bloquear acciones sin permiso. | En desarrollo: listado, decisiones e historial; sin usuarios autenticados ni permisos. |
 | RF-13 | Registrar envío y seguimiento. | Comercial | Alta | Rechazar envío de una versión no aprobada; registrar canal, fecha y versión al marcar envío y consultar historial. | Propuesto |
 | RF-14 | Registrar aceptación o rechazo del cliente. | Cliente mediante comercial | Alta | Registrar respuesta, fecha y referencia de evidencia sobre una versión enviada; impedir aceptar un borrador. | Propuesto |
 | RF-15 | Registrar anticipo simulado. | Comercial | Media | Asociar importe a una propuesta aceptada, marcarlo como simulación y rechazar importes negativos o superiores al total. | Propuesto |
@@ -125,24 +125,24 @@ RF-17 contempla correo, WhatsApp y carga de archivos como integraciones posterio
 
 ## 8. Requisitos no funcionales
 
-Estos umbrales son **objetivos pendientes de implementación y medición**; no representan garantías actuales.
+Estos umbrales expresan el objetivo global. El backend valida entradas y transiciones y registra decisiones en memoria; no garantiza seguridad multiagencia, persistencia, rendimiento ni disponibilidad de IA.
 
 | ID | Categoría | Requisito medible | Forma de verificación | Estado |
 | --- | --- | --- | --- | --- |
 | RNF-01 | Seguridad | Proteger el 100 % de operaciones privadas con autenticación y autorización por agencia; almacenar contraseñas mediante hash adaptativo. | Probar accesos sin sesión, con rol insuficiente y entre agencias; inspeccionar almacenamiento. | Propuesto |
 | RNF-02 | Privacidad | Excluir credenciales y datos de contacto innecesarios del 100 % de solicitudes al modelo y registros técnicos. | Capturar solicitudes y logs con datos ficticios; documentar retención antes de usar datos reales. | Propuesto |
-| RNF-03 | Integridad de estados | Rechazar el 100 % de transiciones inválidas y ediciones concurrentes sobre versiones obsoletas. | Pruebas de matriz de estados, concurrencia y transacciones. | Propuesto |
+| RNF-03 | Integridad de estados | Rechazar el 100 % de transiciones inválidas y ediciones concurrentes sobre versiones obsoletas. | Pruebas de matriz de estados, concurrencia y transacciones. | En desarrollo: transiciones finales y decisiones concurrentes probadas; sin edición/versionado. |
 | RNF-04 | Rendimiento | Alcanzar p95 menor o igual a 2 segundos en CRUD con 20 usuarios concurrentes durante 5 minutos, excluyendo IA y documentos. | Prueba de carga con equipo, volumen y configuración documentados. | Propuesto |
 | RNF-05 | Disponibilidad ante errores de IA | Limitar cada intento a 30 segundos y permitir como máximo un reintento automático; conservar el brief y habilitar revisión manual. | Simular timeout, indisponibilidad y respuesta inválida; verificar datos y recuperación manual. | Propuesto |
-| RNF-06 | Trazabilidad | Registrar actor, fecha, versión y motivo en el 100 % de aprobaciones, rechazos y cambios comerciales; identificar cada ejecución de IA. | Comparar eventos de prueba con historial, sin exponer secretos. | Propuesto |
-| RNF-07 | Mantenibilidad | Probar cada regla de cálculo y transición; evitar dependencias del dominio hacia adaptadores de IA. | Ejecutar pruebas unitarias y revisar dependencias entre paquetes. | Propuesto |
+| RNF-06 | Trazabilidad | Registrar actor, fecha, versión y motivo en el 100 % de aprobaciones, rechazos y cambios comerciales; identificar cada ejecución de IA. | Comparar eventos de prueba con historial, sin exponer secretos. | En desarrollo: evento por decisión con revisor declarado; sin identidad verificada, versiones ni IA. |
+| RNF-07 | Mantenibilidad | Probar cada regla de cálculo y transición; evitar dependencias del dominio hacia adaptadores de IA. | Ejecutar pruebas unitarias y revisar dependencias entre paquetes. | En desarrollo: pruebas de precio, cadena, reglas, sustitución y estados; dominio sin dependencia del adaptador. |
 | RNF-08 | Portabilidad entre proveedores | Sustituir Ollama por Groq mediante configuración y adaptador, sin modificar servicios de negocio. | Ejecutar las mismas pruebas de contrato con ambos adaptadores y respuestas controladas. | Propuesto |
 | RNF-09 | Usabilidad | Lograr que al menos 4 de 5 participantes registren un brief y completen su revisión en menos de 10 minutos sin ayuda. | Prueba de tareas con datos ficticios cuando exista interfaz. | Propuesto |
 | RNF-10 | Accesibilidad | Completar el flujo principal con teclado, foco visible, campos etiquetados y contraste de texto normal de al menos 4,5:1. | Medir contraste y probar teclado y lector de pantalla compatible con la interfaz Java elegida. | Propuesto |
 
 ## 9. Reglas de negocio
 
-Estas reglas aún no cuentan con implementación.
+**Aplicado en la fase 1:** tarifa positiva por solicitud, cálculo decimal, propuesta inicial `EN_REVISION`, una única decisión final e historial con revisor declarado y motivo. Las siguientes reglas describen el alcance global: las referencias a envíos, edición, agencias, contratos y aceptación del cliente siguen pendientes. En particular, el bloqueo por ambigüedades críticas todavía no existe.
 
 1. Ninguna propuesta podrá enviarse ni registrarse como enviada sin aprobación humana de su versión vigente.
 2. El precio se calculará con horas, tarifas y reglas registradas. Cada cotización conservará los valores utilizados y su moneda.
@@ -157,72 +157,78 @@ Estas reglas aún no cuentan con implementación.
 11. No se mezclarán monedas sin una regla explícita. Redondeo, impuestos y descuentos deberán definirse antes de implementar el cálculo.
 12. El cronograma considerará capacidad y dependencias; las horas de esfuerzo no equivalen por sí solas a días calendario.
 
-## 10. Arquitectura propuesta en Java
+## 10. Arquitectura actual y evolución
 
-Spring Boot será el backend. **El repositorio todavía no usa PostgreSQL:** no contiene conexión, dependencias, migraciones ni tablas. Estos paquetes son previstos, no carpetas existentes.
-
-| Capa | Responsabilidad prevista |
+| Paquete | Responsabilidad actual |
 | --- | --- |
-| `controller` | Recibir solicitudes HTTP, validar estructura y devolver respuestas y errores; delegar decisiones de negocio. |
-| `service` | Coordinar casos de uso, transacciones, revisión humana y preparación de cotizaciones. |
-| `domain` | Definir entidades, valores, cálculos y transiciones independientes del proveedor de IA. |
-| `repository` | Definir y resolver acceso a datos; incorporar persistencia en PostgreSQL. |
-| `agent` | Coordinar análisis, validar resultados y conectar proveedores mediante adaptadores. |
-| `document` | Construir propuesta, cronograma y borrador contractual desde datos revisados y versionados. |
-| `config` | Centralizar configuración de Spring, seguridad, persistencia y selección del proveedor. |
+| `api` | Controlador REST, DTO de entrada/salida, validaciones y errores HTTP. |
+| `service` | `CotizacionFacade` coordina el caso de uso. |
+| `domain` | Brief, propuesta con Builder, ítems y eventos. |
+| `agent` | Interfaz de análisis, adaptador local, motor de reglas y handlers. El nombre del paquete no implica IA. |
+| `pricing` | Estrategia de precio por horas con `BigDecimal`. |
+| `workflow` | Objetos State, publicación Observer e historial. |
+| `repository` | Contrato de repositorio e implementación con `ConcurrentHashMap`. |
+| `config` | Ensamblaje de la cadena por inyección de dependencias. |
 
-La dependencia principal será `controller → service → domain`. Los servicios usarán interfaces para persistencia, IA y documentos. El dominio no dependerá de formatos externos de modelos. El prototipo inicial podrá utilizar almacenamiento temporal sustituible, también pendiente de implementación, sin garantizar conservación entre reinicios.
+El controlador delega en la fachada. Cada petición tiene su propio `ContextoBrief`; las propuestas conservan listas inmutables. La transición y su notificación se sincronizan por propuesta para impedir dos decisiones exitosas simultáneas. La respuesta HTTP contiene una copia del estado y del historial bajo el mismo bloqueo.
 
-## 11. Patrones de diseño
+No hay PostgreSQL, transacciones distribuidas ni capa `document`. La sincronización protege una única instancia del proceso; no sustituye una solución de persistencia y concurrencia para varios servidores. El observador actual es síncrono y en memoria; futuros observadores externos requerirán tratamiento de fallos y garantías transaccionales.
 
-Son candidatos vinculados a necesidades concretas. El equipo implementará cada patrón cuando pueda justificarlo con código y casos de prueba.
+## 11. Patrones de diseño implementados
 
-| Patrón | Tipo | Aplicación concreta | Problema que resuelve | Estado real |
-| --- | --- | --- | --- | --- |
-| Facade | Estructural | Una operación de preparación coordina análisis, cálculo y documentos. | Evita que el controlador conozca todos los pasos. | Propuesto; sin código. |
-| Adapter | Estructural | Traducir formatos de Ollama o Groq al contrato Java. | Aísla diferencias entre proveedores. | Propuesto; sin integración. |
-| Strategy | Comportamiento | Encapsular reglas de cálculo cuando existan distintas modalidades comerciales. | Permite variar el cálculo sin acumular condiciones. | Propuesto; comenzar por horas. |
-| State | Comportamiento | Representar comportamiento y transiciones de borrador, revisión, aprobado y enviado. | Impide operaciones incompatibles con el estado. | Propuesto; una enumeración sola no acreditará el patrón. |
-| Builder | Creacional | Construir propuestas con alcance, ítems, condiciones y fases validadas. | Controla la construcción de un objeto compuesto. | Propuesto; sin clases. |
-| Observer | Comportamiento | Notificar a auditoría y métricas tras confirmar una aprobación. | Desacopla efectos secundarios del caso de uso. | Propuesto; sin eventos. |
-| Chain of Responsibility | Comportamiento | Encadenar validaciones de requisitos, tarifas, totales y aprobación. | Permite ordenar validaciones y detenerlas con un motivo de bloqueo. | Propuesto; sin cadena. |
-| Factory Method | Creacional | Un creador de procesadores declara un método que sus variantes sobrescriben para construir el adaptador. | Separa construcción específica y flujo de procesamiento. | Propuesto, sujeto a necesidad; seleccionar un bean no basta para acreditarlo. |
-| Template Method | Comportamiento | Definir validación, composición y renderizado con pasos especializados por documento. | Comparte un procedimiento estable con variaciones controladas. | Propuesto, sujeto a formatos elegidos. |
+| Patrón | Tipo | Clase concreta | Función en el flujo real |
+| --- | --- | --- | --- |
+| Facade | Estructural | `CotizacionFacade` | Coordina cadena, estrategia, Builder, almacenamiento y decisiones. |
+| Chain of Responsibility | Comportamiento | `ValidarBrief`, `DetectarRequisitos`, `IdentificarAmbiguedades`, `EstimarHoras` | Cada handler recibe `ContextoBrief` y delega al siguiente; una entrada inválida detiene la cadena antes del análisis. |
+| Strategy | Comportamiento | `EstrategiaPrecio`, `PrecioPorHoras` | La fachada usa el contrato para multiplicar horas totales por tarifa, sin conocer la implementación. |
+| Builder | Creacional | `Propuesta.Builder` | Reúne brief, requisitos, preguntas, desglose y precio; crea la propuesta en revisión sin constructor público extenso. |
+| State | Comportamiento | `EstadoRevision`, `EnRevision`, `Aprobada`, `Rechazada` | Los objetos de estado permiten o rechazan aprobar/rechazar. La enumeración solo identifica el estado en la respuesta. |
+| Observer | Comportamiento | `PublicadorEventos`, `ObservadorEstado`, `HistorialEventos` | Tras una decisión válida, el publicador notifica al observador, que guarda el evento consultable en `historial`. |
+| Adapter | Estructural | `AnalizadorBrief`, `AdaptadorReglasLocales`, `MotorReglasLocales` | Traduce códigos del motor de palabras clave al contrato usado por los handlers. Permite otro analizador sin modificar la fachada. |
 
-No se incluyen Singleton ni Decorator: todavía no existe una necesidad concreta que justifique añadirlos. La evaluación académica priorizará patrones demostrables.
+Los siete tienen uso en el flujo. No se implementan Factory Method, Template Method, Decorator ni Singleton por requisito académico: podrían evaluarse para construcción de proveedores, documentos, extras y configuración si aparece una necesidad real. La creación de beans de Spring no se presenta como demostración de esos patrones.
 
-## 12. Funcionamiento del agente de IA
+```mermaid
+flowchart LR
+    A[POST brief] --> B[CotizacionFacade]
+    B --> C[Cadena de handlers]
+    C --> D[AnalizadorBrief y adaptador local]
+    C --> E[PrecioPorHoras]
+    E --> F[Propuesta.Builder]
+    F --> G[EN_REVISION en memoria]
+    G --> H[Decisión humana con State]
+    H --> I[Observer e historial]
+```
 
-**La IA aún no está integrada.** Ollama y Groq son opciones por evaluar; no hay proveedor, modelo ni configuración. Sus condiciones de uso y disponibilidad deberán verificarse durante la integración.
+## 12. Análisis local actual e IA futura
 
-Etapas previstas:
+**No hay IA, llamadas a Ollama/Groq ni credenciales.** `MotorReglasLocales` normaliza mayúsculas y acentos y busca palabras completas. Reconoce cada requisito una sola vez:
 
-1. Validar texto y preparar contexto mínimo, evitando datos personales innecesarios.
-2. Clasificar y extraer requisitos vinculados al brief.
-3. Identificar ambigüedades y preguntas para que el comercial consiga aclaraciones fuera del agente.
-4. Sugerir tareas, roles y horas, distinguiendo datos explícitos de supuestos.
-5. Validar estructura y reglas antes de incorporar resultados a una versión de trabajo.
-6. Calcular precio con Java y tarifas registradas; planificar fases según capacidad y dependencias.
-7. Preparar textos desde los datos validados y remitirlos a revisión humana.
+| Palabras reconocidas | Requisito | Horas ilustrativas |
+| --- | --- | --- |
+| página, páginas, web, sitio | Página web | 8 |
+| menú, menús, carta | Menú digital | 8 |
+| reserva, reservas, reservar | Reservas | 8 |
+| pago, pagos, pagar | Pagos | 8 |
 
-Interfaz Java **ilustrativa, aún inexistente en el repositorio**:
+La fórmula es `4 horas de análisis + 8 por requisito distinto + 4 de pruebas y revisión`. Con cero coincidencias se estiman solo 8 horas base y se pregunta por las funcionalidades: no se inventan requisitos. No interpreta negaciones, dependencias, complejidad ni fechas; por ejemplo, «no quiero pagos» también activa la palabra. Es una limitación explícita para la exposición.
+
+El motor añade preguntas fijas por menú, reservas y pagos. Si detecta diciembre pregunta por día y año; en otro caso pregunta por fecha exacta. Estas preguntas invitan a revisar información, no demuestran que el dato esté ausente. El precio es `horasTotales × tarifa`, en COP, con dos decimales y `HALF_UP`; no incluye impuestos, descuentos, costos externos ni tarifas por rol.
+
+Contrato existente:
 
 ```java
-public interface ProveedorIA {
-    ResultadoAnalisis analizar(SolicitudAnalisis solicitud)
-            throws FalloProveedorIA;
+public interface AnalizadorBrief {
+    List<String> detectarRequisitos(String texto);
+    List<String> identificarAmbiguedades(String texto);
 }
 ```
 
-Los tres tipos referenciados también son propuestos. Los futuros `OllamaAdapter` y `GroqAdapter` traducirán formatos externos a este contrato. El resultado contendrá categoría, requisitos, ambigüedades, tareas, horas sugeridas y advertencias; no autorizará operaciones comerciales.
-
-El backend verificará campos obligatorios, tipos, tamaños, horas no negativas, roles permitidos y referencias al brief. Distinguirá datos ausentes de valores cero. El cálculo monetario usará `BigDecimal`, con redondeo pendiente de definición. Las instrucciones contenidas en un brief se tratarán como datos del cliente, sin conceder acceso a envíos, aprobaciones o secretos.
-
-Ante fallos transitorios se aplicarán los límites de RNF-05. Una respuesta inválida o incompleta quedará como fallida o pendiente de corrección; el responsable conservará el brief y podrá completar el trabajo manualmente. No se sustituirán datos faltantes por importes inventados ni se aprobará automáticamente una propuesta.
+Para incorporar IA real será necesario implementar otro adaptador, seleccionar proveedor/modelo mediante configuración, definir un esquema de respuesta y validar campos, tipos, límites y referencias al brief. También faltan timeouts, reintentos limitados, registro de ejecuciones, protección de datos y recuperación manual frente a fallos. La IA futura seguirá sin autorizar envíos, decidir el precio final o firmar contratos. El cálculo y State permanecerán en Java.
 
 ## 13. Modelo de datos propuesto
 
-**No existen tablas ni entidades Java implementadas.** Las relaciones siguientes requieren revisión y traducción a un esquema de persistencia.
+**No existen tablas.** Actualmente hay `Brief` (cliente como texto, texto original y tarifa), `Propuesta`, `ItemEstimado`, `EstadoPropuesta` y `EventoEstado` en Java. La propuesta conserva el brief en memoria; no existe un registro independiente de clientes, tarifas o agencias. La tabla siguiente conserva el modelo futuro, distinto de estos objetos actuales.
 
 | Entidad | Información prevista | Relaciones propuestas |
 | --- | --- | --- |
@@ -242,73 +248,140 @@ Ante fallos transitorios se aplicarán los límites de RNF-05. Una respuesta inv
 
 El esquema definitivo resolverá relaciones de varios a varios, restricciones, versiones y auditoría. El diseño deberá evitar borrados que eliminen evidencia de decisiones comerciales.
 
-## 14. Tecnologías y requisitos para ejecutar el proyecto
+## 14. Tecnologías y ejecución
 
-No existen `pom.xml`, `build.gradle`, wrappers, configuración de Spring ni contenedores. **Aún no es posible ejecutar el proyecto.**
-
-| Tecnología | Decisión o evidencia | Versión o configuración real |
-| --- | --- | --- |
-| Java | Lenguaje previsto para todo el sistema. | Pendiente: versión objetivo del JDK. |
-| Spring Boot | Framework previsto para el backend. | Pendiente: versión y dependencias. |
-| PostgreSQL | Persistencia prevista; aún no utilizada. | Pendiente: versión, esquema y conexión. |
-| Maven o Gradle | No existe herramienta configurada. | Pendiente: selección y versión. |
-| Ollama o Groq | Opciones de integración de IA. | Pendiente: proveedor, modelo y adaptador. |
-| Documentos | Generación prevista en Java. | Pendiente: biblioteca y formatos. |
-| Interfaz | Implementación prevista en Java. | Pendiente: tecnología y requisitos. |
-| Pruebas | No existen pruebas ni herramientas configuradas. | Pendiente. |
-
-| Operación o configuración | Valor comprobado |
+| Elemento | Configuración real |
 | --- | --- |
-| Comando de compilación | Pendiente. |
-| Comando de ejecución | Pendiente. |
-| Comando de pruebas | Pendiente. |
-| Preparación de base de datos y migraciones | Pendiente. |
-| Variables de entorno | Pendiente; no hay nombres definidos en archivos del proyecto. |
-| Puerto y URL base | Pendiente. |
-| Endpoints HTTP | Pendiente; no existen controladores ni rutas. |
-| Usuarios de demostración | Pendiente. |
-| Despliegue | Pendiente; no hay configuración verificada. |
+| Java | Código compilado con `release 21`; requiere JDK 21 o superior compatible. Pruebas ejecutadas con Java 21.0.12 y ejecución HTTP del JAR comprobada con Java 26. |
+| Spring Boot | 4.0.8, con Spring MVC y Jakarta Validation. |
+| Construcción | Maven 3.9.11 mediante Maven Wrapper. La primera ejecución requiere internet para descargar Maven y dependencias. |
+| Pruebas | JUnit, Spring Boot Test y MockMvc. |
+| Persistencia | `ConcurrentHashMap` y cola de eventos en memoria; sin PostgreSQL. |
+| Red | `127.0.0.1:8080` por defecto. `PORT` permite cambiar puerto. |
+| Seguridad | Sin autenticación ni permisos; demostración local con datos ficticios. |
+| IA / credenciales | No se usan proveedores ni claves API. |
 
-El equipo reemplazará estos pendientes por datos obtenidos de los archivos y comandos probados. Las claves API y contraseñas permanecerán fuera del repositorio y de este documento. No se presupone gratuidad de servicios externos.
+La compatibilidad del framework se puede consultar en los [requisitos oficiales de Spring Boot](https://docs.spring.io/spring-boot/4.0/system-requirements.html). `JAVA_HOME`, si está definido, debe apuntar a un JDK compatible; puede diferir del `java` que aparece primero en el PATH.
 
-## 15. Ejemplo de uso
+En PowerShell, desde la carpeta del proyecto:
 
-**Escenario ilustrativo; no corresponde a una ejecución del sistema.**
+```powershell
+Set-Location 'D:\Escritorio\cotizaIA'
+.\mvnw.cmd -v
+.\mvnw.cmd test
+.\mvnw.cmd package
+java -jar .\target\cotizaia-0.1.0.jar
+```
 
-> Tengo un restaurante y quiero una página con menú, fotos y precios. Necesito que la gente reserve mesa desde el celular y pague por internet. También quiero cambiar los platos y que esté lista pronto. No sé si los clientes necesitan cuentas.
+Alternativa durante desarrollo: `./mvnw.cmd spring-boot:run`. Detener con `Ctrl+C`. Al reiniciar, se pierden las propuestas y los eventos. Para cambiar el puerto antes de iniciar:
 
-El análisis propuesto identificaría menú editable, reservas y pagos. El comercial debería aclarar:
+```powershell
+$env:PORT = '8081'
+```
 
-- Si los pagos corresponden a pedidos, anticipos de reserva o ambos; proveedor y moneda.
-- Cómo se controlan cupos, horarios, cancelaciones y confirmaciones.
-- Quién entrega fotos, textos y precios, y quién administra el menú.
-- Qué fecha significa «pronto» y si hacen falta cuentas de clientes.
+Si Maven informa `PKIX path building failed` en Windows, durante esta preparación funcionó usar el almacén de certificados de Windows. La opción mantiene la validación TLS y solo afecta a la sesión actual:
 
-Para este ejercicio se asumen menú administrable, reservas básicas, diseño adaptable y **pagos simulados**. Los pagos reales del restaurante exigirían otro alcance y revisión; tampoco deben confundirse con el anticipo simulado registrado por CotizaIA.
+```powershell
+$env:MAVEN_OPTS = '-Djavax.net.ssl.trustStoreType=Windows-ROOT -Djavax.net.ssl.trustStore=NONE'
+.\mvnw.cmd test
+```
 
-| Tarea | Rol | Horas ilustrativas | Tarifa ilustrativa (COP/h) | Subtotal (COP) |
-| --- | --- | --- | --- | --- |
-| Análisis y aclaraciones | Analista | 6 | 50.000 | 300.000 |
-| Diseño de pantallas | Diseñador | 8 | 50.000 | 400.000 |
-| Menú administrable | Desarrollador | 12 | 60.000 | 720.000 |
-| Reservas básicas | Desarrollador | 16 | 60.000 | 960.000 |
-| Simulación de pagos | Desarrollador | 8 | 60.000 | 480.000 |
-| Pruebas del flujo | Revisor de calidad | 10 | 45.000 | 450.000 |
-| **Total** | | **60** | | **3.310.000** |
+### API disponible
 
-Fórmula: `total = suma(horas del ítem × tarifa del rol)`, sin impuestos, descuentos ni ajustes. Estas tarifas no representan valores de mercado ni registros existentes. **Las horas y el precio son ilustrativos y requieren revisión humana.**
+| Método | Endpoint | Resultado |
+| --- | --- | --- |
+| POST | `/api/briefs` | `201 Created`, propuesta en revisión y cabecera `Location`. |
+| GET | `/api/propuestas` | `200 OK`, lista de todas las propuestas, sin paginación ni filtros. |
+| GET | `/api/propuestas/{id}` | `200 OK`, propuesta e historial. |
+| POST | `/api/propuestas/{id}/aprobar` | `200 OK`, estado `APROBADA` y evento. |
+| POST | `/api/propuestas/{id}/rechazar` | `200 OK`, estado `RECHAZADA` y evento. |
 
-Con capacidad conjunta de 20 horas semanales y trabajo secuencial, se plantearían tres semanas de esfuerzo: análisis y diseño, desarrollo y pruebas, distribuidos según sus horas. Las fechas deberán ajustarse a dependencias y disponibilidad real; no constituyen un compromiso.
+Creación: `cliente` obligatorio de hasta 120 caracteres; `texto` de 10 a 10.000 caracteres, con al menos 10 después de quitar espacios de extremos; `tarifa` positiva con hasta 9 enteros y 2 decimales. Se conserva el texto original. Decisiones: `revisor` obligatorio de hasta 120 caracteres y `motivo` obligatorio de hasta 1.000. No hay endpoint de edición, envío o eliminación.
 
-El comercial revisaría alcance, supuestos, total y cronograma. Tras aprobar una versión, enviaría y registraría la respuesta. Después de la aceptación podría registrar un anticipo simulado del 30 %, equivalente a 993.000 COP, sin acreditar un cobro real.
+| Error | HTTP | Comportamiento |
+| --- | --- | --- |
+| Datos inválidos, JSON incorrecto, UUID mal formado | 400 | Respuesta de error; no crea propuesta ni cambia estado. |
+| UUID válido inexistente | 404 | Propuesta no encontrada. |
+| Aprobar o rechazar una propuesta finalizada | 409 | Conserva estado e historial; no genera otro evento. |
+
+Los errores controlados usan `ProblemDetail` con `status`, `title` y `detail`; los errores de campos incluyen `errores`.
+
+### Verificación automatizada
+
+`CotizacionApiTest` prueba creación, detalle, listado, ambas transiciones, cuatro intentos de cambiar estados finalizados, validación, UUID inválido y recurso inexistente. `PatronesTest` prueba precisión decimal, detención de la cadena, reglas sin duplicados, sustitución del analizador y una única decisión exitosa ante concurrencia. Resultado de la fase: **17 pruebas, 0 fallos, 0 errores**. Los informes se generan en `target/surefire-reports`. También se comprobó el JAR con solicitudes HTTP reales de creación, listado, consulta, aprobación y rechazo posterior bloqueado con 409.
+
+## 15. Ejemplo ejecutable del restaurante
+
+> Necesito una página para mi restaurante con menú, reservas y pagos para diciembre
+
+Ejecutar en otra ventana de PowerShell mientras el servidor está activo:
+
+```powershell
+$base = 'http://127.0.0.1:8080'
+$brief = @{
+    cliente = 'Restaurante La Mesa'
+    texto = 'Necesito una página para mi restaurante con menú, reservas y pagos para diciembre'
+    tarifa = 50000.00
+} | ConvertTo-Json
+$propuesta = Invoke-RestMethod -Method Post -Uri "$base/api/briefs" `
+    -ContentType 'application/json; charset=utf-8' `
+    -Body ([Text.Encoding]::UTF8.GetBytes($brief))
+$propuesta | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Uri "$base/api/propuestas"
+Invoke-RestMethod -Uri "$base/api/propuestas/$($propuesta.id)"
+
+$decision = @{
+    revisor = 'Revisor de demostración'
+    motivo = 'Revisé el alcance y acepto las estimaciones ilustrativas'
+} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri "$base/api/propuestas/$($propuesta.id)/aprobar" `
+    -ContentType 'application/json; charset=utf-8' `
+    -Body ([Text.Encoding]::UTF8.GetBytes($decision))
+```
+
+Respuesta de creación con estructura real; UUID y fecha son ejemplos y cambiarán en cada ejecución:
+
+```json
+{
+  "id": "7a5d627d-f52c-4497-9a43-0597466d5f3a",
+  "cliente": "Restaurante La Mesa",
+  "textoOriginal": "Necesito una página para mi restaurante con menú, reservas y pagos para diciembre",
+  "requisitos": ["Página web", "Menú digital", "Reservas", "Pagos"],
+  "preguntasAclaratorias": [
+    "¿Quién administra el menú y entrega sus contenidos?",
+    "¿Qué horarios, cupos y reglas de cancelación tendrán las reservas?",
+    "¿Qué se pagará, en qué moneda y mediante qué proveedor?",
+    "¿Cuál es el día y año de entrega en diciembre?"
+  ],
+  "desgloseHoras": [
+    {"tarea": "Análisis del brief", "horas": 4},
+    {"tarea": "Página web", "horas": 8},
+    {"tarea": "Menú digital", "horas": 8},
+    {"tarea": "Reservas", "horas": 8},
+    {"tarea": "Pagos", "horas": 8},
+    {"tarea": "Pruebas y revisión", "horas": 4}
+  ],
+  "horasTotales": 40,
+  "tarifa": 50000.00,
+  "moneda": "COP",
+  "precioTotal": 2000000.00,
+  "fecha": "2026-09-29T16:00:00Z",
+  "estado": "EN_REVISION",
+  "historial": []
+}
+```
+
+**Horas y precio ilustrativos, sujetos a revisión humana.** Detectar «Pagos» solo añade un requisito y su estimación: no implementa una pasarela ni un cobro simulado. Tampoco convierte «diciembre» en una fecha comprometida ni genera cronograma.
+
+Después de aprobar, el estado será `APROBADA` y `historial` contendrá un evento con `propuestaId`, `anterior`, `nuevo`, `fecha`, `revisor` y `motivo`. Para demostrar rechazo, crear otra propuesta y usar `/rechazar` con el mismo formato de decisión. Repetir cualquiera de las decisiones sobre una propuesta finalizada devuelve `409 Conflict` y conserva un único evento. No se envían correos.
 
 ## 16. Plan de desarrollo por fases
 
-Todas las fases están pendientes. Primero se demostrará el flujo de negocio y su revisión.
+La fase 1 tiene implementado su flujo básico con reglas locales y revisión. Sus ampliaciones y las fases 2 a 4 siguen pendientes.
 
 | Fase | Trabajo previsto | Evidencia de cierre |
 | --- | --- | --- |
-| 1. Backend y revisión humana | Crear proyecto Java con Spring Boot, dominio, ingreso de texto, estimación manual, cálculo y revisión; usar datos temporales si hace falta. | Cotización revisable y pruebas de cálculo y bloqueo de envío sin aprobación. Prototipo sin exposición de datos reales. |
+| 1. Backend y revisión humana | Implementado: Spring Boot, dominio, texto, reglas, cálculo y decisiones en memoria. Pendiente: edición y resolución de preguntas. | API y pruebas de creación, cálculo, entradas inválidas, estados y concurrencia. No hay endpoint de envío. |
 | 2. Persistencia y seguridad | Incorporar PostgreSQL, migraciones, registro, inicio de sesión, permisos, aislamiento por agencia e historial. | Datos conservados entre reinicios y pruebas de autorización, aislamiento y concurrencia. |
 | 3. IA y documentos | Implementar contrato de proveedor, primer adaptador, validación, manejo de fallos y documentos editables. | Análisis controlados, recuperación manual y documentos coherentes con la versión revisada. |
 | 4. Integraciones, frontend y métricas | Construir interfaz en Java, evaluar canales, registrar anticipos simulados y medir tiempos y estados. | Flujo desde la interfaz, pruebas de canales incorporados y evaluación del objetivo temporal. |
@@ -324,4 +397,4 @@ Completar según los acuerdos del equipo. Una persona puede asumir varias áreas
 | [Nombre pendiente] | IA y documentos | [Completar] | [Completar] |
 | [Nombre pendiente] | Interfaz, pruebas y documentación | [Completar] | [Completar] |
 
-**Por completar:** integrantes, versiones de Java y Spring Boot, herramienta de construcción, configuración de PostgreSQL, interfaz Java, proveedor y modelo de IA, formatos documentales, reglas comerciales definitivas, comandos, endpoints y datos de evaluación de tiempos.
+**Por completar:** integrantes, configuración de PostgreSQL, autenticación y permisos, interfaz Java, proveedor y modelo de IA, documentos, reglas comerciales definitivas y evaluación de tiempos.
