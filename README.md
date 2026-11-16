@@ -2,6 +2,16 @@
 
 Proyecto universitario para la asignatura **Patrones de Software**.
 
+> **Este repositorio es la Fase 1 (prototipo, septiembre de 2026).** El sistema completo vive en tres repositorios:
+>
+> | Repositorio | Qué contiene |
+> | --- | --- |
+> | [backend-cotizaIA](https://github.com/GUERRREROALEXANDER/backend-cotizaIA) | API Java 17 + Spring Boot con PostgreSQL, agente con IA, memoria de propuestas pasadas (RAG), subida de PDF, 17 patrones GoF y más de 550 pruebas |
+> | [frontend-cotizaIA](https://github.com/GUERRREROALEXANDER/frontend-cotizaIA) | Centro de operaciones en React para la agencia |
+> | [base-de-datos-CotizaIA](https://github.com/GUERRREROALEXANDER/base-de-datos-CotizaIA) | Migraciones Flyway, esquema PostgreSQL y diagrama entidad-relación |
+>
+> Varias capacidades marcadas aquí como "Propuesto" (agencias y usuarios, PostgreSQL, IA real, contratos, cronogramas, envíos, frontend, pagos simulados, métricas) ya están implementadas allí. La agencia de demostración se carga con `python scripts/seed_demo.py` en el backend.
+
 CotizaIA es un proyecto para agencias pequeñas y freelancers. Su primera fase es una API REST que recibe un brief, detecta requisitos y preguntas mediante reglas locales, estima horas ilustrativas, calcula un precio y crea una propuesta para aprobación o rechazo humano. **Las reglas actuales no son inteligencia artificial.** La visión posterior contempla un agente sin conversación, cronogramas y borradores contractuales; no existen todavía esas capacidades.
 
 El backend está escrito en **Java con Spring Boot**. Guarda propuestas e historial **en memoria: se pierden al reiniciar**. PostgreSQL sigue previsto para una fase posterior.
